@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        #map {
+            width: 600px;
+            height: 600px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map"></div>
+    <script>
+        function initMap() {
+            var myLatLng = { lat: 34.70046472, lng: 135.49728256 };
+            var map = new google.maps.Map(document.getElementById('map'), {
+                center: myLatLng,
+                zoom: 8
+            });
+
+            $.ajax({
+                url: "./out.csv",
+                success: function (data) {
+                    const lines = data.split("\n");
+                    for (let i = 1; i < lines.length; i++) {
+                        const val = lines[i].split(",");
+                        if (val.length !== 7) {
+                            continue;
+                        }
+
+                        const id = val[1].replace(".", "") + ".png";
+                        const ne = { lat: Number(val[4]), lng: Number(val[3]) };
+                        const sw = { lat: Number(val[2]), lng: Number(val[5]) };
+                        const opacity = { opacity: Number(val[6]) };
+
+                        console.log(id, ne, sw)
+                        new google.maps.GroundOverlay(id,
+                            new google.maps.LatLngBounds(ne, sw),
+                            opacity
+                        ).setMap(map);
+                    };
+                }
+            });
+        }
+
+    </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_KEY&callback=initMap"
+        async defer></script>
+</body>
+
+</html>
